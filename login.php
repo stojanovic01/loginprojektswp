@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Hash-Funktionen aus externer Datei laden -->
+    <script src="hash.js"></script>
     <script>
-    async function hashAndSubmit(event) {
-        event.preventDefault();
-
+    function hashAndSubmit() {
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
-        // SHA-256 Hash
-        const msgBuffer = new TextEncoder().encode(password);
-        const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
+        if (!username || !password) {
+            alert("Bitte Username und Passwort eingeben!");
+            return;
+        }
+
+        // SHA-256 Hash aus hash.js verwenden
+        const hashHex = sha256Hash(password);
 
         // Hash ins versteckte Feld
         document.getElementById("password_hash").value = hashHex;
@@ -30,7 +32,7 @@
 </head>
 <body>
     <h2>Login</h2>
-    <form id="loginForm" method="post" action="check_pwd.php" onsubmit="hashAndSubmit(event)">
+    <form id="loginForm" method="post" action="check_pwd.php">
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" required><br><br>
 
@@ -39,8 +41,8 @@
 
         <!-- Hashwert -->
         <input type="hidden" name="password_hash" id="password_hash">
-
-        <input type="submit" value="Login">
+        
+        <button type="button" onclick="hashAndSubmit()">Login</button>
     </form>
 </body>
 </html>

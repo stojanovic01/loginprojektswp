@@ -1,7 +1,6 @@
 <?php
 //$host = "e157104-mysql.services.easyname.eu";
 $host = "localhost";
-
 $user = "u243204db1";
 $pass = "01122024spSP.";
 $dbname = "u243204db1";
