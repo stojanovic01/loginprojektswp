@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="style.css"> 
     <script>
     async function hashAndSubmit(event) {
         event.preventDefault(); // Formular nicht sofort senden
-        const email = document.getElementById("email").value;
+        const emailadresse = document.getElementById("emailadresse").value;
         const password = document.getElementById("password").value;
 
         // SHA-256 Hash mit SubtleCrypto
@@ -29,8 +30,8 @@
 <body>
     <h2>Login</h2>
     <form id="loginForm" method="post" action="check_pwd.php" onsubmit="hashAndSubmit(event)">
-        <label for="email">E-Mail:</label>
-        <input type="email" name="email" id="email" required><br><br>
+        <label for="emailadresse">Email-Adresse:</label>
+        <input type="emailadresse" name="emailadresse" id="emailadresse" required><br><br>
 
         <label for="password">Passwort:</label>
         <input type="password" id="password" required><br><br>
