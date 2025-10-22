@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-// Robuste E-Mail Funktion einbinden
-require_once 'send_email_robust.php';
+// EmailJS wird verwendet - keine PHP Email-Funktion mehr nötig
 
 $host = "e157104-mysql.services.easyname.eu";
 $user = "u243204db1"; 
