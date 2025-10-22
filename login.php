@@ -6,24 +6,15 @@
     <link rel="stylesheet" href="style.css"> 
     <script>
     async function hashAndSubmit(event) {
-        event.preventDefault(); // Formular nicht sofort senden
-        const emailadresse = document.getElementById("emailadresse").value;
+        event.preventDefault();
         const password = document.getElementById("password").value;
-
-        // SHA-256 Hash mit SubtleCrypto
         const msgBuffer = new TextEncoder().encode(password);
         const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-
-        // Hashwert in verstecktes Feld eintragen
         document.getElementById("password_hash").value = hashHex;
-
-        // Passwortfeld leeren (zur Sicherheit)
         document.getElementById("password").value = "";
-
-        // Formular absenden
-        document.getElementById("loginForm").submit();
+        event.target.submit(); // Das Formular absenden
     }
     </script>
 </head>
@@ -31,15 +22,15 @@
     <h2>Login</h2>
     <form id="loginForm" method="post" action="check_pwd.php" onsubmit="hashAndSubmit(event)">
         <label for="emailadresse">Email-Adresse:</label>
-        <input type="emailadresse" name="emailadresse" id="emailadresse" required><br><br>
+        <input type="email" name="emailadresse" id="emailadresse" required><br><br>
 
         <label for="password">Passwort:</label>
-        <input type="password" id="password" required><br><br>
+        <input type="password" name="password" id="password" required><br><br>
 
         <!-- hier landet der Hash -->
         <input type="hidden" name="password_hash" id="password_hash">
 
-        <input type="submit" value="Login">
+        <button type="submit">Login</button>
     </form>
 </body>
 </html>

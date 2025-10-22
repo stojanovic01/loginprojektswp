@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// PHPMailer Email-Funktion einbinden
+require_once 'send_email.php';
+
 $host = "e157104-mysql.services.easyname.eu";
 $user = "u243204db1"; 
 $pass = "01122024spSP."; 
@@ -15,7 +18,7 @@ if ($conn->connect_error) {
 $emailadresse = $_POST['emailadresse'];
 $password_hash = $_POST['password_hash'];
 
-$sql = "SELECT * FROM users WHERE emailadresse=? AND password_hash=?";
+$sql = "SELECT * FROM user WHERE email_adresse=? AND user_password=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $emailadresse, $password_hash);
 $stmt->execute();
@@ -37,18 +40,23 @@ if ($result->num_rows === 1) {
     $stmt_insert->execute();
     $stmt_insert->close();
     
-    // E-Mail senden
-    $betreff = "Ihr 2FA Login-Code";
-    $nachricht = "Ihr Verifizierungscode lautet: " . $code . "\n\nDieser Code ist 2 Minuten gültig.";
-    $headers = "From: noreply@yourdomain.com\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    // Debug: Code generiert
+    echo "DEBUG: Code generiert: " . $code . "<br>";
+    echo "DEBUG: Session gesetzt für Email: " . $emailadresse . "<br>";
     
-    if (mail($emailadresse, $betreff, $nachricht, $headers)) {
+    // E-Mail mit PHPMailer senden
+    $emailSent = sendVerificationEmail($emailadresse, $code);
+    echo "DEBUG: E-Mail-Versand Ergebnis: " . ($emailSent ? "Erfolgreich" : "Fehlgeschlagen") . "<br>";
+    
+    if ($emailSent) {
         // Weiterleitung zur Code-Eingabe
-        header("Location: verify_code.php");
-        exit();
+        echo "DEBUG: Weiterleitung zu verify_code.php...<br>";
+        echo '<a href="verify_code.php">Manuell weiterleiten (falls automatisch nicht funktioniert)</a><br>';
+        // header("Location: verify_code.php");
+        // exit();
     } else {
-        echo "Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut.";
+        echo "Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut.<br>";
+        echo '<a href="login.php">Zurück zum Login</a>';
     }
     
 } else {
