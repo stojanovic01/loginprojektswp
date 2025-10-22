@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Robuste E-Mail Funktion einbinden
+require_once 'send_email_robust.php';
+
 $host = "e157104-mysql.services.easyname.eu";
 $user = "u243204db1"; 
 $pass = "01122024spSP."; 
@@ -33,13 +36,42 @@ if ($result->num_rows === 1) {
     $_SESSION['2fa_code'] = $code;
     $_SESSION['2fa_time'] = time();
     
-    // Code erstmal direkt anzeigen (ohne E-Mail)
-    echo "<!DOCTYPE html><html><head><title>2FA Code</title><link rel='stylesheet' href='style.css'></head><body>";
+    // E-Mail mit EmailJS (Frontend-Lösung)
+    echo "<!DOCTYPE html><html><head><title>2FA Code</title><link rel='stylesheet' href='style.css'>";
+    echo '<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>';
+    echo "</head><body>";
     echo "<h2>Login erfolgreich!</h2>";
-    echo "<p>Dein 2FA Code: <strong style='font-size: 2em; color: green;'>$code</strong></p>";
-    echo "<p>Gib diesen Code auf der nächsten Seite ein:</p>";
+    echo "<p>Sende 2FA Code an <strong>$emailadresse</strong>...</p>";
+    echo '<div id="email-status">Sende E-Mail...</div>';
+    echo "<p><strong>Dein Code: <span style='font-size: 2em; color: green;'>$code</span></strong></p>";
+    echo "<p>(Falls E-Mail nicht ankommt, verwende den Code oben)</p>";
     echo '<a href="verify_code.php" style="background: green; color: white; padding: 10px; text-decoration: none;">Code eingeben</a><br><br>';
     echo '<a href="login.php">Zurück zum Login</a>';
+    
+    echo '<script>
+        // EmailJS konfiguration - TRAGE DEINE ECHTEN DATEN EIN!
+        emailjs.init("KZtWegtZ4OXhRpgNX"); // z.B. "user_abc123defgh"
+        
+        const templateParams = {
+            to_name: "Benutzer",
+            to_email: "' . $emailadresse . '",
+            verification_code: "' . $code . '"
+        };
+        
+        // Versuche E-Mail zu senden - TRAGE DEINE ECHTEN IDs EIN!
+        emailjs.send("service_j39neem", "template_c0qfciv", templateParams)
+            .then(function(response) {
+                console.log("EmailJS Erfolg:", response);
+                document.getElementById("email-status").innerHTML = "✅ E-Mail erfolgreich gesendet!";
+                document.getElementById("email-status").style.color = "green";
+            })
+            .catch(function(error) {
+                console.error("EmailJS Fehler Details:", error);
+                document.getElementById("email-status").innerHTML = "⚠️ Fehler: " + error.text + " - verwende den Code oben";
+                document.getElementById("email-status").style.color = "orange";
+            });
+    </script>';
+    
     echo "</body></html>";
     
 } else {
